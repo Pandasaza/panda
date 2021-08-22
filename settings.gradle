@@ -1,0 +1,5 @@
+rootProject.name = 'panda'
+include 'panda-auth'
+include 'panda-common'
+include 'panda-api'
+

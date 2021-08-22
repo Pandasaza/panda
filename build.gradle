@@ -1,0 +1,100 @@
+buildscript {
+    ext {
+        dependencyManagementVersion = '1.0.11.RELEASE'
+        springBootVersion = '2.5.4'
+    }
+
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
+
+    group = 'com.panda'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+        dependencies {
+
+        }
+    }
+
+    // common dependencies
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.slf4j:slf4j-api'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    }
+
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+    compileJava.options.encoding = 'UTF-8'
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(':panda-common') {
+    bootJar {
+        enabled = false
+    }
+    jar {
+        enabled = true
+    }
+
+    dependencies {
+    }
+}
+
+project(':panda-auth'){
+    dependencies {
+        implementation project(':panda-common')
+
+        // todo ( Add the necessary dependencies for auth module )
+        implementation group: 'com.auth0', name: 'java-jwt', version: '3.18.1'
+        implementation group: 'org.springframework.data', name: 'spring-data-redis', version: '2.5.2'
+        implementation group: 'io.lettuce', name: 'lettuce-core', version: '6.1.4.RELEASE'
+        implementation group: 'org.json', name: 'json', version: '20210307'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        testImplementation 'org.springframework.security:spring-security-test'
+    }
+}
+
+project(':panda-api'){
+    dependencies {
+        // todo ( Add the necessary dependencies for api module )
+        implementation project(':panda-common')
+    }
+}
+
+
